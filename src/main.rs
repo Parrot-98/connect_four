@@ -1,44 +1,52 @@
 use raylib::prelude::*;
 
+struct Ball {
+    position: Vector2,
+    velocity_y: f32,
+}
+
 fn main() {
     let height = 480.0;
     let width = 640.0;
-    let mut ball_pos = Vector2::new(300.0, 50.0); 
-    let mut velocity_y = 0.0;
-    let restitution = 0.7;
+    
+    let mut balls: Vec<Ball> = Vec::new();
 
     const GRAVITY: f32 = 0.5;
     const RADIUS: f32 = 20.0;
+    const RESTITUTION: f32 = 0.75;
 
     let (mut rl, thread) = raylib::init()
         .size(width as i32, height as i32)
-        .title("Checkers")
+        .title("Gravity")
         .build();
 
     rl.set_target_fps(60);
 
     while !rl.window_should_close() {
-        //input
         if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT) {
-            let mouse_pos = rl.get_mouse_position();
-            ball_pos.x = mouse_pos.x;
-            ball_pos.y = mouse_pos.y;
-            velocity_y = 0.0;
+            let m_pos = rl.get_mouse_position();
+            balls.push(Ball {
+                position: m_pos,
+                velocity_y: 0.0,
+            });
         }
 
-        velocity_y += GRAVITY;
-        ball_pos.y += velocity_y;
+        for ball in balls.iter_mut() {
+            ball.velocity_y += GRAVITY;
+            ball.position.y += ball.velocity_y;
 
-        //collision
-        if ball_pos.y > height - RADIUS {
-            ball_pos.y = height - RADIUS;
-            velocity_y = -velocity_y * restitution;
+            if ball.position.y > height - RADIUS {
+                ball.position.y = height - RADIUS;
+                ball.velocity_y = -ball.velocity_y * RESTITUTION;
+            }
         }
 
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(Color::BLACK);
         
-        d.draw_text("Checkers", 12, 12, 20, Color::WHITE);
-        d.draw_circle(ball_pos.x as i32, ball_pos.y as i32, RADIUS, Color::BLUE);
+        for ball in &balls {
+            d.draw_circle(ball.position.x as i32, ball.position.y as i32, RADIUS, Color::RED);
+        }
+        
     }
 }
