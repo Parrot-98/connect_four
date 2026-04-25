@@ -12,7 +12,7 @@ fn main() {
     const HEIGHT: i32 = 980;
     const RADIUS: f32 = 50.0;
     const G: f32 = 1000.0;
-    const SOFTENING: f32 = 25.0;
+    const SOFTENING: f32 = 150.0;
     const MASS: f32 = 300.0;
 
     let (mut rl, thread) = raylib::init()
@@ -25,7 +25,7 @@ fn main() {
     let mut balls: Vec<Ball> = Vec::new();
 
     while !rl.window_should_close() {
-        let dt = rl.get_frame_time().min(0.05);
+        let dt = 1.0 / 120.0;
 
         if rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT) {
             if balls.len() < 10 {
